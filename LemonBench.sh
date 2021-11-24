@@ -150,7 +150,7 @@ Global_StartupInit_Action() {
     Check_Virtwhat
     Check_JSONQuery
     Check_Speedtest
-    Check_BestTrace
+    Check_WorstTrace
     Check_Spoofer
     Check_SysBench
     echo -e "${Msg_Info}Starting Test ...\n\n"
@@ -1258,211 +1258,211 @@ Function_DiskTest_Full() {
     sleep 1
 }
 
-# =============== BestTrace 部分 ===============
-Run_BestTrace() {
-    mkdir -p ${WorkDir}/BestTrace/ >/dev/null 2>&1
-    # 调用方式: Run_BestTrace "目标IP" "ICMP/TCP" "最大跃点数" "说明"
+# =============== WorstTrace 部分 ===============
+Run_WorstTrace() {
+    mkdir -p ${WorkDir}/WorstTrace/ >/dev/null 2>&1
+    # 调用方式: Run_WorstTrace "目标IP" "ICMP/TCP" "最大跃点数" "说明"
     if [ "$2" = "tcp" ] || [ "$2" = "TCP" ]; then
         echo -e "Traceroute to $4 (TCP Mode, Max $3 Hop)"
         echo -e "============================================================"
-        echo -e "\nTraceroute to $4 (TCP Mode, Max $3 Hop)" >>${WorkDir}/BestTrace/result.txt
-        echo -e "============================================================" >>${WorkDir}/BestTrace/result.txt
-        /usr/local/lemonbench/bin/besttrace -g en -q 1 -n -T -m $3 $1 | tee -a ${WorkDir}/BestTrace/result.txt
+        echo -e "\nTraceroute to $4 (TCP Mode, Max $3 Hop)" >>${WorkDir}/WorstTrace/result.txt
+        echo -e "============================================================" >>${WorkDir}/WorstTrace/result.txt
+        /usr/local/lemonbench/bin/worsttrace --maxhop $3 $1 | tee -a ${WorkDir}/WorstTrace/result.txt
     else
         echo -e "Traceroute to $4 (ICMP Mode, Max $3 Hop)"
         echo -e "============================================================"
-        echo -e "\nTracecroute to $4 (ICMP Mode, Max $3 Hop)" >>${WorkDir}/BestTrace/result.txt
-        echo -e "============================================================" >>${WorkDir}/BestTrace/result.txt
-        /usr/local/lemonbench/bin/besttrace -g en -q 1 -n -m $3 $1 | tee -a ${WorkDir}/BestTrace/result.txt
+        echo -e "\nTracecroute to $4 (ICMP Mode, Max $3 Hop)" >>${WorkDir}/WorstTrace/result.txt
+        echo -e "============================================================" >>${WorkDir}/WorstTrace/result.txt
+        /usr/local/lemonbench/bin/worsttrace --maxhop $3 $1 | tee -a ${WorkDir}/WorstTrace/result.txt
     fi
 }
 
-Run_BestTrace6() {
-    # 调用方式: Run_BestTrace "目标IP" "ICMP/TCP" "最大跃点数" "说明"
+Run_WorstTrace6() {
+    # 调用方式: Run_WorstTrace "目标IP" "ICMP/TCP" "最大跃点数" "说明"
     if [ "$2" = "tcp" ] || [ "$2" = "TCP" ]; then
         echo -e "Traceroute to $4 (TCP Mode, Max $3 Hop)"
         echo -e "============================================================"
-        echo -e "\nTraceroute to $4 (TCP Mode, Max $3 Hop)" >>${WorkDir}/BestTrace/result.txt
-        echo -e "============================================================" >>${WorkDir}/BestTrace/result.txt
-        /usr/local/lemonbench/bin/besttrace -g en -6 -q 1 -n -T -m $3 $1 >>${WorkDir}/BestTrace/result.txt
+        echo -e "\nTraceroute to $4 (TCP Mode, Max $3 Hop)" >>${WorkDir}/WorstTrace/result.txt
+        echo -e "============================================================" >>${WorkDir}/WorstTrace/result.txt
+        /usr/local/lemonbench/bin/worsttrace --maxhop $3 $1 >>${WorkDir}/WorstTrace/result.txt
     elif [ "$2" = "icmp" ] || [ "$2" = "ICMP" ]; then
         echo -e "Traceroute to $4 (ICMP Mode, Max $3 Hop)"
         echo -e "============================================================"
-        echo -e "Traceroute to $4 (ICMP Mode, Max $3 Hop)" >>${WorkDir}/BestTrace/result.txt
-        echo -e "============================================================" >>${WorkDir}/BestTrace/result.txt
-        /usr/local/lemonbench/bin/besttrace -g en -6 -q 1 -n -m $3 $1 | tee -a ${WorkDir}/BestTrace/result.txt
+        echo -e "Traceroute to $4 (ICMP Mode, Max $3 Hop)" >>${WorkDir}/WorstTrace/result.txt
+        echo -e "============================================================" >>${WorkDir}/WorstTrace/result.txt
+        /usr/local/lemonbench/bin/worsttrace --maxhop $3 $1 | tee -a ${WorkDir}/WorstTrace/result.txt
     fi
 }
 
-Function_BestTrace_Fast() {
-    Check_BestTrace
-    mkdir -p ${WorkDir}/BestTrace/ >/dev/null 2>&1
+Function_WorstTrace_Fast() {
+    Check_WorstTrace
+    mkdir -p ${WorkDir}/WorstTrace/ >/dev/null 2>&1
     if [ "${LBench_Result_NetworkStat}" = "ipv4only" ] || [ "${LBench_Result_NetworkStat}" = "dualstack" ]; then
         echo -e "\n ${Font_Yellow}-> Traceroute Test (IPV4)${Font_Suffix}\n"
-        echo -e "\n -> Traceroute Test (IPV4)\n" >>${WorkDir}/BestTrace/result.txt
+        echo -e "\n -> Traceroute Test (IPV4)\n" >>${WorkDir}/WorstTrace/result.txt
         # LemonBench RouteTest 节点列表 Ver 20191112
         # 国内部分
-        Run_BestTrace "123.125.99.1" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CU"
-        Run_BestTrace "180.149.128.9" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CT"
-        Run_BestTrace "211.136.25.153" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CM"
-        Run_BestTrace "58.247.8.158" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CU"
-        Run_BestTrace "180.153.28.5" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CT"
-        Run_BestTrace "221.183.55.22" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CM"
-        Run_BestTrace "210.21.4.130" "${GlobalVar_TracerouteMode}" "50" "China, Guangzhou CU"
-        Run_BestTrace "113.108.209.1" "${GlobalVar_TracerouteMode}" "50" "China, Guangzhou CT"
-        Run_BestTrace "120.196.212.25" "${GlobalVar_TracerouteMode}" "50" "China, Guangzhou CM"
-        Run_BestTrace "210.13.66.238" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CU AS9929"
-        Run_BestTrace "58.32.0.1" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CT CN2"
-        Run_BestTrace "14.131.128.1" "${GlobalVar_TracerouteMode}" "50" "China, Beijing Dr.Peng Home Network"
-        Run_BestTrace "211.167.230.100" "${GlobalVar_TracerouteMode}" "50" "China, Beijing Dr.Peng Network IDC Network"
-        Run_BestTrace "202.205.109.205" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CERNET"
-        Run_BestTrace "159.226.254.1" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CSTNET"
-        Run_BestTrace "211.156.140.17" "${GlobalVar_TracerouteMode}" "50" "China, Beijing GCable"
+        Run_WorstTrace "123.125.99.1" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CU"
+        Run_WorstTrace "180.149.128.9" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CT"
+        Run_WorstTrace "211.136.25.153" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CM"
+        Run_WorstTrace "58.247.8.158" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CU"
+        Run_WorstTrace "180.153.28.5" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CT"
+        Run_WorstTrace "221.183.55.22" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CM"
+        Run_WorstTrace "210.21.4.130" "${GlobalVar_TracerouteMode}" "50" "China, Guangzhou CU"
+        Run_WorstTrace "113.108.209.1" "${GlobalVar_TracerouteMode}" "50" "China, Guangzhou CT"
+        Run_WorstTrace "120.196.212.25" "${GlobalVar_TracerouteMode}" "50" "China, Guangzhou CM"
+        Run_WorstTrace "210.13.66.238" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CU AS9929"
+        Run_WorstTrace "58.32.0.1" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CT CN2"
+        Run_WorstTrace "14.131.128.1" "${GlobalVar_TracerouteMode}" "50" "China, Beijing Dr.Peng Home Network"
+        Run_WorstTrace "211.167.230.100" "${GlobalVar_TracerouteMode}" "50" "China, Beijing Dr.Peng Network IDC Network"
+        Run_WorstTrace "202.205.109.205" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CERNET"
+        Run_WorstTrace "159.226.254.1" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CSTNET"
+        Run_WorstTrace "211.156.140.17" "${GlobalVar_TracerouteMode}" "50" "China, Beijing GCable"
     fi
     if [ "${LBench_Result_NetworkStat}" = "ipv6only" ] || [ "${LBench_Result_NetworkStat}" = "dualstack" ]; then
         echo -e "\n ${Font_Yellow}-> Traceroute Test (IPV6)${Font_Suffix}\n"
-        echo -e "\n -> Traceroute Test (IPV6)\n" >>${WorkDir}/BestTrace/result.txt
-        Run_BestTrace6 "2408:80f0:4100:2005::3" "ICMP" "50" "China, Beijing CU IPV6"
-        Run_BestTrace6 "240e:18:10:a01::1" "ICMP" "50" "China, Shanghai CT IPV6"
-        Run_BestTrace6 "2409:8057:5c00:30::6" "ICMP" "50" "China, Guangzhou CM IPV6"
-        Run_BestTrace6 "2001:da8:a0:1001::1" "ICMP" "50" "China, Beijing CERNET2 IPV6"
-        Run_BestTrace6 "2400:dd00:0:37::213" "ICMP" "50" "China, Beijing CSTNET IPV6"
+        echo -e "\n -> Traceroute Test (IPV6)\n" >>${WorkDir}/WorstTrace/result.txt
+        Run_WorstTrace6 "2408:80f0:4100:2005::3" "ICMP" "50" "China, Beijing CU IPV6"
+        Run_WorstTrace6 "240e:18:10:a01::1" "ICMP" "50" "China, Shanghai CT IPV6"
+        Run_WorstTrace6 "2409:8057:5c00:30::6" "ICMP" "50" "China, Guangzhou CM IPV6"
+        Run_WorstTrace6 "2001:da8:a0:1001::1" "ICMP" "50" "China, Beijing CERNET2 IPV6"
+        Run_WorstTrace6 "2400:dd00:0:37::213" "ICMP" "50" "China, Beijing CSTNET IPV6"
     fi
     # 执行完成, 标记FLAG
-    LBench_Flag_FinishBestTraceFast="1"
+    LBench_Flag_FinishWorstTraceFast="1"
     sleep 1
 }
 
-Function_BestTrace_Full() {
-    Check_BestTrace
-    mkdir -p ${WorkDir}/BestTrace/ >/dev/null 2>&1
+Function_WorstTrace_Full() {
+    Check_WorstTrace
+    mkdir -p ${WorkDir}/WorstTrace/ >/dev/null 2>&1
     if [ "${LBench_Result_NetworkStat}" = "ipv4only" ] || [ "${LBench_Result_NetworkStat}" = "dualstack" ] || [ "${LBench_Result_NetworkStat}" = "unknown" ]; then
         echo -e "\n ${Font_Yellow}-> Traceroute Test (IPV4)${Font_Suffix}\n"
-        echo -e "\n -> Traceroute Test (IPV4)\n" >>${WorkDir}/BestTrace/result.txt
+        echo -e "\n -> Traceroute Test (IPV4)\n" >>${WorkDir}/WorstTrace/result.txt
         # LemonBench RouteTest 节点列表 Ver 20191112
         # 国内部分
-        Run_BestTrace "123.125.99.1" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CU"
-        Run_BestTrace "180.149.128.1" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CT"
-        Run_BestTrace "211.136.25.153" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CM"
-        Run_BestTrace "58.247.0.49" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CU"
-        Run_BestTrace "180.153.28.1" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CT"
-        Run_BestTrace "221.183.55.22" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CM"
-        Run_BestTrace "210.21.4.130" "${GlobalVar_TracerouteMode}" "50" "China, Guangzhou CU"
-        Run_BestTrace "113.108.209.1" "${GlobalVar_TracerouteMode}" "50" "China, Guangzhou CT"
-        Run_BestTrace "211.139.129.5" "${GlobalVar_TracerouteMode}" "50" "China, Guangzhou CM"
-        Run_BestTrace "210.13.66.238" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CU AS9929"
-        Run_BestTrace "58.32.0.1" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CT CN2"
-        Run_BestTrace "14.131.128.1" "${GlobalVar_TracerouteMode}" "50" "China, Beijing Dr.Peng Home Network"
-        Run_BestTrace "211.167.230.100" "${GlobalVar_TracerouteMode}" "50" "China, Beijing Dr.Peng Network IDC Network"
-        Run_BestTrace "202.205.109.205" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CERNET"
-        Run_BestTrace "159.226.254.1" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CSTNET"
-        Run_BestTrace "211.156.140.17" "${GlobalVar_TracerouteMode}" "50" "China, Beijing GCable"
+        Run_WorstTrace "123.125.99.1" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CU"
+        Run_WorstTrace "180.149.128.1" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CT"
+        Run_WorstTrace "211.136.25.153" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CM"
+        Run_WorstTrace "58.247.0.49" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CU"
+        Run_WorstTrace "180.153.28.1" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CT"
+        Run_WorstTrace "221.183.55.22" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CM"
+        Run_WorstTrace "210.21.4.130" "${GlobalVar_TracerouteMode}" "50" "China, Guangzhou CU"
+        Run_WorstTrace "113.108.209.1" "${GlobalVar_TracerouteMode}" "50" "China, Guangzhou CT"
+        Run_WorstTrace "211.139.129.5" "${GlobalVar_TracerouteMode}" "50" "China, Guangzhou CM"
+        Run_WorstTrace "210.13.66.238" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CU AS9929"
+        Run_WorstTrace "58.32.0.1" "${GlobalVar_TracerouteMode}" "50" "China, Shanghai CT CN2"
+        Run_WorstTrace "14.131.128.1" "${GlobalVar_TracerouteMode}" "50" "China, Beijing Dr.Peng Home Network"
+        Run_WorstTrace "211.167.230.100" "${GlobalVar_TracerouteMode}" "50" "China, Beijing Dr.Peng Network IDC Network"
+        Run_WorstTrace "202.205.109.205" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CERNET"
+        Run_WorstTrace "159.226.254.1" "${GlobalVar_TracerouteMode}" "50" "China, Beijing CSTNET"
+        Run_WorstTrace "211.156.140.17" "${GlobalVar_TracerouteMode}" "50" "China, Beijing GCable"
         # 香港部分
-        Run_BestTrace "203.160.95.218" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong CU"
-        Run_BestTrace "203.215.232.173" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong CT"
-        Run_BestTrace "203.8.25.187" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong CT CN2"
-        Run_BestTrace "203.142.105.9" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong CM"
-        Run_BestTrace "218.188.104.30" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong HGC"
-        Run_BestTrace "210.6.23.239" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong HKBN"
-        Run_BestTrace "202.85.125.60" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong PCCW"
-        Run_BestTrace "202.123.76.239" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong TGT"
-        Run_BestTrace "59.152.252.242" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong WTT"
+        Run_WorstTrace "203.160.95.218" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong CU"
+        Run_WorstTrace "203.215.232.173" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong CT"
+        Run_WorstTrace "203.8.25.187" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong CT CN2"
+        Run_WorstTrace "203.142.105.9" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong CM"
+        Run_WorstTrace "218.188.104.30" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong HGC"
+        Run_WorstTrace "210.6.23.239" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong HKBN"
+        Run_WorstTrace "202.85.125.60" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong PCCW"
+        Run_WorstTrace "202.123.76.239" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong TGT"
+        Run_WorstTrace "59.152.252.242" "${GlobalVar_TracerouteMode}" "50" "China, Hongkong WTT"
         # 新加坡部分
-        Run_BestTrace "203.215.233.1" "${GlobalVar_TracerouteMode}" "50" "Singapore, China CT"
-        Run_BestTrace "183.91.61.1" "${GlobalVar_TracerouteMode}" "50" "Singapore, China CT CN2"
-        Run_BestTrace "118.201.1.11" "${GlobalVar_TracerouteMode}" "50" "Singapore, Singtel"
-        Run_BestTrace "203.116.46.33" "${GlobalVar_TracerouteMode}" "50" "Singapore, StarHub"
-        Run_BestTrace "118.189.184.1" "${GlobalVar_TracerouteMode}" "50" "Singapore, M1"
-        Run_BEstTrace "118.189.38.17" "${GlobalVar_TracerouteMode}" "50" "Singapore, M1 GamePro"
-        Run_BestTrace "13.228.0.251" "${GlobalVar_TracerouteMode}" "50" "Singapore, AWS"
+        Run_WorstTrace "203.215.233.1" "${GlobalVar_TracerouteMode}" "50" "Singapore, China CT"
+        Run_WorstTrace "183.91.61.1" "${GlobalVar_TracerouteMode}" "50" "Singapore, China CT CN2"
+        Run_WorstTrace "118.201.1.11" "${GlobalVar_TracerouteMode}" "50" "Singapore, Singtel"
+        Run_WorstTrace "203.116.46.33" "${GlobalVar_TracerouteMode}" "50" "Singapore, StarHub"
+        Run_WorstTrace "118.189.184.1" "${GlobalVar_TracerouteMode}" "50" "Singapore, M1"
+        Run_worsttrace "118.189.38.17" "${GlobalVar_TracerouteMode}" "50" "Singapore, M1 GamePro"
+        Run_WorstTrace "13.228.0.251" "${GlobalVar_TracerouteMode}" "50" "Singapore, AWS"
         # 日本部分
-        Run_BestTrace "61.213.155.84" "${GlobalVar_TracerouteMode}" "50" "Japan, NTT"
-        Run_BestTrace "202.232.15.70" "${GlobalVar_TracerouteMode}" "50" "Japan, IIJ"
-        Run_BestTrace "210.175.32.26" "${GlobalVar_TracerouteMode}" "50" "Japan, SoftBank"
-        Run_BestTrace "106.162.242.108" "${GlobalVar_TracerouteMode}" "50" "Japan, KDDI"
-        Run_BestTrace "203.215.236.3" "${GlobalVar_TracerouteMode}" "50" "Japan, China CT"
-        Run_BestTrace "202.55.27.4" "${GlobalVar_TracerouteMode}" "50" "Japan, China CT CN2"
-        Run_BestTrace "13.112.63.251" "${GlobalVar_TracerouteMode}" "50" "Japan, Amazon AWS"
+        Run_WorstTrace "61.213.155.84" "${GlobalVar_TracerouteMode}" "50" "Japan, NTT"
+        Run_WorstTrace "202.232.15.70" "${GlobalVar_TracerouteMode}" "50" "Japan, IIJ"
+        Run_WorstTrace "210.175.32.26" "${GlobalVar_TracerouteMode}" "50" "Japan, SoftBank"
+        Run_WorstTrace "106.162.242.108" "${GlobalVar_TracerouteMode}" "50" "Japan, KDDI"
+        Run_WorstTrace "203.215.236.3" "${GlobalVar_TracerouteMode}" "50" "Japan, China CT"
+        Run_WorstTrace "202.55.27.4" "${GlobalVar_TracerouteMode}" "50" "Japan, China CT CN2"
+        Run_WorstTrace "13.112.63.251" "${GlobalVar_TracerouteMode}" "50" "Japan, Amazon AWS"
         # 韩国部分
-        Run_BestTrace "210.114.41.101" "${GlobalVar_TracerouteMode}" "50" "South Korea, KT"
-        Run_BestTrace "175.122.253.62 " "${GlobalVar_TracerouteMode}" "50" "South Korea, SK"
-        Run_BestTrace "211.174.62.44" "${GlobalVar_TracerouteMode}" "50" "South Korea, LG"
-        Run_BestTrace "218.185.246.3" "${GlobalVar_TracerouteMode}" "50" "South Korea, China CT CN2"
-        Run_BestTrace "13.124.63.251" "${GlobalVar_TracerouteMode}" "50" "South Korea, Amazon AWS"
+        Run_WorstTrace "210.114.41.101" "${GlobalVar_TracerouteMode}" "50" "South Korea, KT"
+        Run_WorstTrace "175.122.253.62 " "${GlobalVar_TracerouteMode}" "50" "South Korea, SK"
+        Run_WorstTrace "211.174.62.44" "${GlobalVar_TracerouteMode}" "50" "South Korea, LG"
+        Run_WorstTrace "218.185.246.3" "${GlobalVar_TracerouteMode}" "50" "South Korea, China CT CN2"
+        Run_WorstTrace "13.124.63.251" "${GlobalVar_TracerouteMode}" "50" "South Korea, Amazon AWS"
         # 台湾部分
-        Run_BestTrace "202.133.242.116" "${GlobalVar_TracerouteMode}" "50" "China, Taiwan Chief"
-        Run_BestTrace "210.200.69.90" "${GlobalVar_TracerouteMode}" "50" "China, Taiwan APTG"
-        Run_BestTrace "203.75.129.162" "${GlobalVar_TracerouteMode}" "50" "China, Taiwan CHT"
-        Run_BestTrace "219.87.66.3" "${GlobalVar_TracerouteMode}" "50" "China, Taiwan TFN"
-        Run_BestTrace "211.73.144.38" "${GlobalVar_TracerouteMode}" "50" "China,Taiwan FET"
-        Run_BestTrace "61.63.0.102" "${GlobalVar_TracerouteMode}" "50" "China, Taiwan KBT"
-        Run_BestTrace "103.31.196.203" "${GlobalVar_TracerouteMode}" "50" "China, Taiwan TAIFO"
+        Run_WorstTrace "202.133.242.116" "${GlobalVar_TracerouteMode}" "50" "China, Taiwan Chief"
+        Run_WorstTrace "210.200.69.90" "${GlobalVar_TracerouteMode}" "50" "China, Taiwan APTG"
+        Run_WorstTrace "203.75.129.162" "${GlobalVar_TracerouteMode}" "50" "China, Taiwan CHT"
+        Run_WorstTrace "219.87.66.3" "${GlobalVar_TracerouteMode}" "50" "China, Taiwan TFN"
+        Run_WorstTrace "211.73.144.38" "${GlobalVar_TracerouteMode}" "50" "China,Taiwan FET"
+        Run_WorstTrace "61.63.0.102" "${GlobalVar_TracerouteMode}" "50" "China, Taiwan KBT"
+        Run_WorstTrace "103.31.196.203" "${GlobalVar_TracerouteMode}" "50" "China, Taiwan TAIFO"
         # 美国部分
-        Run_BestTrace "218.30.33.17" "${GlobalVar_TracerouteMode}" "50" "United States, Los Angeles China CT"
-        Run_BestTrace "66.102.252.100" "${GlobalVar_TracerouteMode}" "50" "United States, Los Angeles China CT CN2"
-        Run_BestTrace "63.218.42.81" "${GlobalVar_TracerouteMode}" "50" "United States, Los Angeles PCCW"
-        Run_BestTrace "66.220.18.42" "${GlobalVar_TracerouteMode}" "50" "United States, Los Angeles HE"
-        Run_BestTrace "173.205.77.98" "${GlobalVar_TracerouteMode}" "50" "United States, Los Angeles GTT"
-        Run_BestTrace "12.169.215.33" "${GlobalVar_TracerouteMode}" "50" "United States, San Fransico ATT"
-        Run_BestTrace "66.198.181.100" "${GlobalVar_TracerouteMode}" "50" "United States, New York TATA"
-        Run_BestTrace "218.30.33.17" "${GlobalVar_TracerouteMode}" "50" "United States, San Jose China CT"
-        Run_BestTrace "23.11.26.62" "${GlobalVar_TracerouteMode}" "50" "United States, San Jose NTT"
-        Run_BestTrace "72.52.104.74" "${GlobalVar_TracerouteMode}" "50" "United States, Fremont HE"
-        Run_BestTrace "205.216.62.38" "${GlobalVar_TracerouteMode}" "50" "United States, Las Vegas Level3"
-        Run_BestTrace "64.125.191.31" "${GlobalVar_TracerouteMode}" "50" "United States, San Jose ZAYO"
-        Run_BestTrace "149.127.109.166" "${GlobalVar_TracerouteMode}" "50" "United States, Ashburn Cogentco"
+        Run_WorstTrace "218.30.33.17" "${GlobalVar_TracerouteMode}" "50" "United States, Los Angeles China CT"
+        Run_WorstTrace "66.102.252.100" "${GlobalVar_TracerouteMode}" "50" "United States, Los Angeles China CT CN2"
+        Run_WorstTrace "63.218.42.81" "${GlobalVar_TracerouteMode}" "50" "United States, Los Angeles PCCW"
+        Run_WorstTrace "66.220.18.42" "${GlobalVar_TracerouteMode}" "50" "United States, Los Angeles HE"
+        Run_WorstTrace "173.205.77.98" "${GlobalVar_TracerouteMode}" "50" "United States, Los Angeles GTT"
+        Run_WorstTrace "12.169.215.33" "${GlobalVar_TracerouteMode}" "50" "United States, San Fransico ATT"
+        Run_WorstTrace "66.198.181.100" "${GlobalVar_TracerouteMode}" "50" "United States, New York TATA"
+        Run_WorstTrace "218.30.33.17" "${GlobalVar_TracerouteMode}" "50" "United States, San Jose China CT"
+        Run_WorstTrace "23.11.26.62" "${GlobalVar_TracerouteMode}" "50" "United States, San Jose NTT"
+        Run_WorstTrace "72.52.104.74" "${GlobalVar_TracerouteMode}" "50" "United States, Fremont HE"
+        Run_WorstTrace "205.216.62.38" "${GlobalVar_TracerouteMode}" "50" "United States, Las Vegas Level3"
+        Run_WorstTrace "64.125.191.31" "${GlobalVar_TracerouteMode}" "50" "United States, San Jose ZAYO"
+        Run_WorstTrace "149.127.109.166" "${GlobalVar_TracerouteMode}" "50" "United States, Ashburn Cogentco"
         # 欧洲部分
-        Run_BestTrace "80.146.191.1" "${GlobalVar_TracerouteMode}" "50" "German, Telekom"
-        Run_BestTrace "82.113.108.25" "${GlobalVar_TracerouteMode}" "50" "German, Frankfurt O2"
-        Run_BestTrace "139.7.146.11" "${GlobalVar_TracerouteMode}" "50" "German, Frankfurt Vodafone"
-        Run_BestTrace "118.85.205.101" "${GlobalVar_TracerouteMode}" "50" "German, Frankfurt China CT"
-        Run_BestTrace "5.10.138.33" "${GlobalVar_TracerouteMode}" "50" "German, Frankfurt China CT CN2"
-        Run_BestTrace "213.200.65.70" "${GlobalVar_TracerouteMode}" "50" "German, Frankfurt GTT"
-        Run_BestTrace "212.20.150.5" "${GlobalVar_TracerouteMode}" "50" "German, FrankfurtCogentco"
-        Run_BestTrace "194.62.232.211" "${GlobalVar_TracerouteMode}" "50" "United Kingdom, Vodafone"
-        Run_BestTrace "213.121.43.24" "${GlobalVar_TracerouteMode}" "50" "United Kingdom， BT"
-        Run_BestTrace "80.231.131.34" "${GlobalVar_TracerouteMode}" "50" "United Kingdom, London TATA"
-        Run_BestTrace "118.85.205.181" "${GlobalVar_TracerouteMode}" "50" "Russia, China CT"
-        Run_BestTrace "185.75.173.17" "${GlobalVar_TracerouteMode}" "50" "Russia, China CT CN2"
-        Run_BestTrace "87.226.162.77" "${GlobalVar_TracerouteMode}" "50" "Russia, Moscow RT"
-        Run_BestTrace "217.150.32.2" "${GlobalVar_TracerouteMode}" "50" "Russia, Moscow TTK"
-        Run_BestTrace "195.34.32.71" "${GlobalVar_TracerouteMode}" "50" "Russia, Moscow MTS"
+        Run_WorstTrace "80.146.191.1" "${GlobalVar_TracerouteMode}" "50" "German, Telekom"
+        Run_WorstTrace "82.113.108.25" "${GlobalVar_TracerouteMode}" "50" "German, Frankfurt O2"
+        Run_WorstTrace "139.7.146.11" "${GlobalVar_TracerouteMode}" "50" "German, Frankfurt Vodafone"
+        Run_WorstTrace "118.85.205.101" "${GlobalVar_TracerouteMode}" "50" "German, Frankfurt China CT"
+        Run_WorstTrace "5.10.138.33" "${GlobalVar_TracerouteMode}" "50" "German, Frankfurt China CT CN2"
+        Run_WorstTrace "213.200.65.70" "${GlobalVar_TracerouteMode}" "50" "German, Frankfurt GTT"
+        Run_WorstTrace "212.20.150.5" "${GlobalVar_TracerouteMode}" "50" "German, FrankfurtCogentco"
+        Run_WorstTrace "194.62.232.211" "${GlobalVar_TracerouteMode}" "50" "United Kingdom, Vodafone"
+        Run_WorstTrace "213.121.43.24" "${GlobalVar_TracerouteMode}" "50" "United Kingdom， BT"
+        Run_WorstTrace "80.231.131.34" "${GlobalVar_TracerouteMode}" "50" "United Kingdom, London TATA"
+        Run_WorstTrace "118.85.205.181" "${GlobalVar_TracerouteMode}" "50" "Russia, China CT"
+        Run_WorstTrace "185.75.173.17" "${GlobalVar_TracerouteMode}" "50" "Russia, China CT CN2"
+        Run_WorstTrace "87.226.162.77" "${GlobalVar_TracerouteMode}" "50" "Russia, Moscow RT"
+        Run_WorstTrace "217.150.32.2" "${GlobalVar_TracerouteMode}" "50" "Russia, Moscow TTK"
+        Run_WorstTrace "195.34.32.71" "${GlobalVar_TracerouteMode}" "50" "Russia, Moscow MTS"
     fi
     if [ "${LBench_Result_NetworkStat}" = "ipv6only" ] || [ "${LBench_Result_NetworkStat}" = "dualstack" ] || [ "${LBench_Result_NetworkStat}" = "unknown" ]; then
         echo -e "\n ${Font_Yellow}-> Traceroute Test (IPV6)${Font_Suffix}\n"
-        echo -e "\n -> Traceroute Test (IPV6)\n" >>${WorkDir}/BestTrace/result.txt
+        echo -e "\n -> Traceroute Test (IPV6)\n" >>${WorkDir}/WorstTrace/result.txt
         # 国内部分
-        Run_BestTrace6 "2408:80f0:4100:2005::3" "ICMP" "50" "China, Beijing CU IPV6"
-        Run_BestTrace6 "2400:da00:2::29" "ICMP" "50" "China, Beijing CT IPV6"
-        Run_BestTrace6 "2409:8089:1020:50ff:1000::fd01" "ICMP" "50" "China, Beijing CM IPV6"
-        Run_BestTrace6 "2408:8000:9000:20e6::b7" "ICMP" "50" "China, Shanghai CU IPV6"
-        Run_BestTrace6 "240e:18:10:a01::1" "ICMP" "50" "China, Shanghai CT IPV6"
-        Run_BestTrace6 "2409:801e:5c03:2000::207" "ICMP" "50" "China, Shanghai CM IPV6"
-        Run_BestTrace6 "2408:8001:3011:310::3" "ICMP" "50" "China, Guangzhou CU IPV6"
-        Run_BestTrace6 "240e:ff:e02c:1:21::" "ICMP" "50" "China, Guangzhou CT IPV6"
-        Run_BestTrace6 "2409:8057:5c00:30::6" "ICMP" "50" "China, Guangzhou CM IPV6"
-        Run_BestTrace6 "2403:8880:400f::2" "ICMP" "50" "China, Beijing Dr.Peng IPV6"
-        Run_BestTrace6 "2001:da8:a0:1001::1" "ICMP" "50" "China, Beijing CERNET2 IPV6"
-        Run_BestTrace6 "2400:dd00:0:37::213" "ICMP" "50" "China, Beijing CSTNET IPV6"
+        Run_WorstTrace6 "2408:80f0:4100:2005::3" "ICMP" "50" "China, Beijing CU IPV6"
+        Run_WorstTrace6 "2400:da00:2::29" "ICMP" "50" "China, Beijing CT IPV6"
+        Run_WorstTrace6 "2409:8089:1020:50ff:1000::fd01" "ICMP" "50" "China, Beijing CM IPV6"
+        Run_WorstTrace6 "2408:8000:9000:20e6::b7" "ICMP" "50" "China, Shanghai CU IPV6"
+        Run_WorstTrace6 "240e:18:10:a01::1" "ICMP" "50" "China, Shanghai CT IPV6"
+        Run_WorstTrace6 "2409:801e:5c03:2000::207" "ICMP" "50" "China, Shanghai CM IPV6"
+        Run_WorstTrace6 "2408:8001:3011:310::3" "ICMP" "50" "China, Guangzhou CU IPV6"
+        Run_WorstTrace6 "240e:ff:e02c:1:21::" "ICMP" "50" "China, Guangzhou CT IPV6"
+        Run_WorstTrace6 "2409:8057:5c00:30::6" "ICMP" "50" "China, Guangzhou CM IPV6"
+        Run_WorstTrace6 "2403:8880:400f::2" "ICMP" "50" "China, Beijing Dr.Peng IPV6"
+        Run_WorstTrace6 "2001:da8:a0:1001::1" "ICMP" "50" "China, Beijing CERNET2 IPV6"
+        Run_WorstTrace6 "2400:dd00:0:37::213" "ICMP" "50" "China, Beijing CSTNET IPV6"
         # 香港部分
-        Run_BestTrace6 "2001:7fa:0:1::ca28:a1a9" "ICMP" "50" "China, Hongkong HKIX IPV6"
-        Run_BestTrace6 "2001:470:0:490::2" "ICMP" "50" "China, Hongkong HE IPV6"
+        Run_WorstTrace6 "2001:7fa:0:1::ca28:a1a9" "ICMP" "50" "China, Hongkong HKIX IPV6"
+        Run_WorstTrace6 "2001:470:0:490::2" "ICMP" "50" "China, Hongkong HE IPV6"
         # 美国部分
-        Run_BestTrace6 "2001:470:1:ff::1" "ICMP" "50" "United States, San Jose HE IPV6"
-        Run_BestTrace6 "2001:418:0:5000::1026" "ICMP" "50" "United States, Chicago NTT IPV6"
-        Run_BestTrace6 "2001:2000:3080:1e96::2" "ICMP" "50" "United States, Los Angeles Telia IPV6"
-        Run_BestTrace6 "2001:668:0:3:ffff:0:d8dd:9d5a" "ICMP" "50" "United States, Los Angeles GTT IPV6"
-        Run_BestTrace6 "2600:0:1:1239:144:228:241:71" "ICMP" "50" "United States, Kansas City Sprint IPV6"
-        Run_BestTrace6 "2600:80a:2::15" "ICMP" "50" "United States, Los Angeles Verizon IPV6"
-        Run_BestTrace6 "2001:550:0:1000::9a36:4215" "ICMP" "50" "United Status, Ashburn Cogentco IPV6"
-        Run_BestTrace6 "2001:1900:2100::2eb5" "ICMP" "50" "United States, San Jose Level3 IPV6"
-        Run_BestTrace6 "2001:438:ffff::407d:d6a" "ICMP" "50" "United States, Seattle Zayo IPV6"
+        Run_WorstTrace6 "2001:470:1:ff::1" "ICMP" "50" "United States, San Jose HE IPV6"
+        Run_WorstTrace6 "2001:418:0:5000::1026" "ICMP" "50" "United States, Chicago NTT IPV6"
+        Run_WorstTrace6 "2001:2000:3080:1e96::2" "ICMP" "50" "United States, Los Angeles Telia IPV6"
+        Run_WorstTrace6 "2001:668:0:3:ffff:0:d8dd:9d5a" "ICMP" "50" "United States, Los Angeles GTT IPV6"
+        Run_WorstTrace6 "2600:0:1:1239:144:228:241:71" "ICMP" "50" "United States, Kansas City Sprint IPV6"
+        Run_WorstTrace6 "2600:80a:2::15" "ICMP" "50" "United States, Los Angeles Verizon IPV6"
+        Run_WorstTrace6 "2001:550:0:1000::9a36:4215" "ICMP" "50" "United Status, Ashburn Cogentco IPV6"
+        Run_WorstTrace6 "2001:1900:2100::2eb5" "ICMP" "50" "United States, San Jose Level3 IPV6"
+        Run_WorstTrace6 "2001:438:ffff::407d:d6a" "ICMP" "50" "United States, Seattle Zayo IPV6"
         # 欧洲部分
-        Run_BestTrace6 "2001:470:0:349::1" "ICMP" "50" "France, Paris HE IPV6"
-        Run_BestTrace6 "2001:728:0:5000::6f6" "ICMP" "50" "German, Frankfurt NTT IPV6"
+        Run_WorstTrace6 "2001:470:0:349::1" "ICMP" "50" "France, Paris HE IPV6"
+        Run_WorstTrace6 "2001:728:0:5000::6f6" "ICMP" "50" "German, Frankfurt NTT IPV6"
     fi
     # 执行完成, 标记FLAG
-    LBench_Flag_FinishBestTraceFull="1"
+    LBench_Flag_FinishWorstTraceFull="1"
     sleep 1
 }
 
@@ -1679,7 +1679,7 @@ Function_GenerateResult() {
     Function_GenerateResult_SysBench_MemoryTest >/dev/null
     Function_GenerateResult_DiskTest >/dev/null
     Function_GenerateResult_Speedtest >/dev/null
-    Function_GenerateResult_BestTrace >/dev/null
+    Function_GenerateResult_WorstTrace >/dev/null
     Function_GenerateResult_Spoofer >/dev/null
     Function_GenerateResult_Footer >/dev/null
     echo -e "${Msg_Info}Generating Report ..."
@@ -1715,8 +1715,8 @@ Function_GenerateResult() {
         cat ${WorkDir}/result/07-speedtest.result >>${WorkDir}/result/finalresult.txt
     fi
     sleep 0.2
-    if [ -f "${WorkDir}/result/08-besttrace.result" ]; then
-        cat ${WorkDir}/result/08-besttrace.result >>${WorkDir}/result/finalresult.txt
+    if [ -f "${WorkDir}/result/08-worsttrace.result" ]; then
+        cat ${WorkDir}/result/08-worsttrace.result >>${WorkDir}/result/finalresult.txt
     fi
     sleep 0.2
     if [ -f "${WorkDir}/result/09-spoofer.result" ]; then
@@ -1888,10 +1888,10 @@ Function_GenerateResult_Speedtest() {
     fi
 }
 
-Function_GenerateResult_BestTrace() {
+Function_GenerateResult_WorstTrace() {
     sleep 0.1
-    if [ -f "${WorkDir}/BestTrace/result.txt" ]; then
-        cp -f ${WorkDir}/BestTrace/result.txt ${WorkDir}/result/08-besttrace.result
+    if [ -f "${WorkDir}/WorstTrace/result.txt" ]; then
+        cp -f ${WorkDir}/WorstTrace/result.txt ${WorkDir}/result/08-worsttrace.result
     fi
 }
 
@@ -2051,95 +2051,56 @@ Check_Speedtest_GetComponent() {
     fi
 }
 
-# =============== 检查 BestTrace 组件 ===============
-Check_BestTrace() {
-    if [ ! -f "/usr/local/lemonbench/bin/besttrace" ]; then
-        SystemInfo_GetOSRelease
-        SystemInfo_GetSystemBit
-        if [ "${LBench_Result_SystemBit_Full}" = "amd64" ]; then
-            local BinaryName="besttrace64"
-            local DownloadSrc="https://raindrop.ilemonrain.com/LemonBench/include/BestTrace/besttrace64.tar.gz"
-            # local DownloadSrc="https://raw.githubusercontent.com/LemonBench/LemonBench/master/Resources/BestTrace/besttrace64.tar.gz"
-        elif [ "${LBench_Result_SystemBit_Full}" = "i386" ]; then
-            local BinaryName="besttrace32"
-            local DownloadSrc="https://raindrop.ilemonrain.com/LemonBench/include/BestTrace/besttrace32.tar.gz"
-            # local DownloadSrc="https://raw.githubusercontent.com/LemonBench/LemonBench/master/Resources/BestTrace/besttrace32.tar.gz"
-        elif [ "${LBench_Result_SystemBit_Full}" = "arm" ]; then
-            local BinaryName="besttracearm"
-            local DownloadSrc="https://raindrop.ilemonrain.com/LemonBench/include/BestTrace/besttracearm.tar.gz"
-            # local DownloadSrc="https://raw.githubusercontent.com/LemonBench/LemonBench/master/Resources/BestTrace/besttracearm.tar.gz"
-        else
-            local BinaryName="besttrace32"
-            local DownloadSrc="https://raindrop.ilemonrain.com/LemonBench/include/BestTrace/besttrace32.tar.gz"
-            # local DownloadSrc="https://raw.githubusercontent.com/LemonBench/LemonBench/master/Resources/BestTrace/besttrace32.tar.gz"
-        fi
+# =============== 检查 WorstTrace 组件 ===============
+Check_WorstTrace() {
+    if [ ! -f "/usr/local/lemonbench/bin/worsttrace" ]; then
         mkdir -p ${WorkDir}/ >/dev/null 2>&1
         mkdir -p /usr/local/lemonbench/bin/ >/dev/null 2>&1
         if [ "${Var_OSRelease}" = "centos" ] || [ "${Var_OSRelease}" = "rhel" ]; then
-            echo -e "${Msg_Warning}BestTrace Module not found, Installing ..."
+            echo -e "${Msg_Warning}WorstTrace Module not found, Installing ..."
             echo -e "${Msg_Info}Installing Dependency ..."
             yum -y install curl unzip
-            echo -e "${Msg_Info}Downloading BestTrace Module ..."
-            curl --user-agent "${UA_LemonBench}" ${DownloadSrc} -o ${WorkDir}/besttrace.tar.gz
-            echo -e "${Msg_Info}Installing BestTrace Module ..."
-            pushd ${WorkDir} >/dev/null
-            tar xf besttrace.tar.gz
-            mv ${BinaryName} /usr/local/lemonbench/bin/besttrace
-            chmod +x /usr/local/lemonbench/bin/besttrace
+            echo -e "${Msg_Info}Downloading WorstTrace Module ..."
+            curl --user-agent "${UA_LemonBench}" https://wtrace.app/packages/linux/worsttrace -o /usr/local/lemonbench/bin/worsttrace
+            echo -e "${Msg_Info}Installing WorstTrace Module ..."
+			chmod +x /usr/local/lemonbench/bin/worsttrace
             popd >/dev/null
-            echo -e "${Msg_Info}Cleaning up ..."
-            rm -rf ${WorkDir}/besttrace.tar.gz
         elif [ "${Var_OSRelease}" = "ubuntu" ] || [ "${Var_OSRelease}" = "debian" ]; then
-            echo -e "${Msg_Warning}BestTrace Module not found, Installing ..."
+            echo -e "${Msg_Warning}WorstTrace Module not found, Installing ..."
             echo -e "${Msg_Info}Installing Dependency ..."
             apt-get update
             apt-get --no-install-recommends -y install wget unzip curl ca-certificates
-            echo -e "${Msg_Info}Downloading BestTrace Module ..."
-            curl --user-agent "${UA_LemonBench}" ${DownloadSrc} -o ${WorkDir}/besttrace.tar.gz
-            echo -e "${Msg_Info}Installing BestTrace Module ..."
-            pushd ${WorkDir} >/dev/null
-            tar xf besttrace.tar.gz
-            mv ${BinaryName} /usr/local/lemonbench/bin/besttrace
-            chmod +x /usr/local/lemonbench/bin/besttrace
+            echo -e "${Msg_Info}Downloading WorstTrace Module ..."
+            curl --user-agent "${UA_LemonBench}" https://wtrace.app/packages/linux/worsttrace -o /usr/local/lemonbench/bin/worsttrace
+            echo -e "${Msg_Info}Installing WorstTrace Module ..."
+			chmod +x /usr/local/lemonbench/bin/worsttrace
             popd >/dev/null
-            echo -e "${Msg_Info}Cleaning up ..."
-            rm -rf ${WorkDir}/besttrace.tar.gz
         elif [ "${Var_OSRelease}" = "fedora" ]; then
-            echo -e "${Msg_Warning}BestTrace Module not found, Installing ..."
+            echo -e "${Msg_Warning}WorstTrace Module not found, Installing ..."
             echo -e "${Msg_Info}Installing Dependency ..."
             dnf -y install wget unzip curl
-            echo -e "${Msg_Info}Downloading BestTrace Module ..."
-            curl  --user-agent "${UA_LemonBench}" ${DownloadSrc} -o ${WorkDir}/besttrace.tar.gz
-            echo -e "${Msg_Info}Installing BestTrace Module ..."
-            pushd ${WorkDir} >/dev/null
-            tar xf besttrace.tar.gz
-            mv ${BinaryName} /usr/local/lemonbench/bin/besttrace
-            chmod +x /usr/local/lemonbench/bin/besttrace
+            echo -e "${Msg_Info}Downloading WorstTrace Module ..."
+            curl --user-agent "${UA_LemonBench}" https://wtrace.app/packages/linux/worsttrace -o /usr/local/lemonbench/bin/worsttrace
+            echo -e "${Msg_Info}Installing WorstTrace Module ..."
+			chmod +x /usr/local/lemonbench/bin/worsttrace
             popd >/dev/null
-            echo -e "${Msg_Info}Cleaning up ..."
-            rm -rf ${WorkDir}/besttrace.tar.gz
         elif [ "${Var_OSRelease}" = "alpinelinux" ]; then
-            echo -e "${Msg_Warning}BestTrace Module not found, Installing ..."
+            echo -e "${Msg_Warning}WorstTrace Module not found, Installing ..."
             echo -e "${Msg_Info}Installing Dependency ..."
             apk update
             apk add wget unzip curl
-            echo -e "${Msg_Info}Downloading BestTrace Module ..."
-            curl --user-agent "${UA_LemonBench}" ${DownloadSrc} -o ${WorkDir}/besttrace.tar.gz
-            echo -e "${Msg_Info}Installing BestTrace Module ..."
-            pushd ${WorkDir} >/dev/null
-            tar xf besttrace.tar.gz
-            mv ${BinaryName} /usr/local/lemonbench/bin/besttrace
-            chmod +x /usr/local/lemonbench/bin/besttrace
+            echo -e "${Msg_Info}Downloading WorstTrace Module ..."
+            curl --user-agent "${UA_LemonBench}" https://wtrace.app/packages/linux/worsttrace -o /usr/local/lemonbench/bin/worsttrace
+            echo -e "${Msg_Info}Installing WorstTrace Module ..."
+			chmod +x /usr/local/lemonbench/bin/worsttrace
             popd >/dev/null
-            echo -e "${Msg_Info}Cleaning up ..."
-            rm -rf ${WorkDir}/besttrace.tar.gz
         else
-            echo -e "${Msg_Warning}BestTrace Module not found, but we could not find the os's release ..."
+            echo -e "${Msg_Warning}WorstTrace Module not found, but we could not find the os's release ..."
         fi
     fi
     # 二次检测
-    if [ ! -f "/usr/local/lemonbench/bin/besttrace" ]; then
-        echo -e "BestTrace Moudle install Failure! Try Restart Bench or Manually install it! (/usr/local/lemonbench/bin/besttrace)"
+    if [ ! -f "/usr/local/lemonbench/bin/worsttrace" ]; then
+        echo -e "WorstTrace Moudle install Failure! Try Restart Bench or Manually install it! (/usr/local/lemonbench/bin/worsttrace)"
         exit 1
     fi
 }
@@ -2531,9 +2492,9 @@ Check_Sysbench_InstantBuild() {
 Function_CheckTracemode() {
     if [ "${Flag_TracerouteModeisSet}" = "1" ]; then
         if [ "${GlobalVar_TracerouteMode}" = "icmp" ]; then
-            echo -e "${Msg_Info}Traceroute/BestTrace Tracemode is set to: ${Font_SkyBlue}ICMP Mode${Font_Suffix}"
+            echo -e "${Msg_Info}Traceroute/WorstTrace Tracemode is set to: ${Font_SkyBlue}ICMP Mode${Font_Suffix}"
         elif [ "${GlobalVar_TracerouteMode}" = "tcp" ]; then
-            echo -e "${Msg_Info}Traceroute/BestTrace Tracemode is set to: ${Font_SkyBlue}TCP Mode${Font_Suffix}"
+            echo -e "${Msg_Info}Traceroute/WorstTrace Tracemode is set to: ${Font_SkyBlue}TCP Mode${Font_Suffix}"
         fi
     else
         GlobalVar_TracerouteMode="tcp"
@@ -2582,7 +2543,7 @@ Entrance_FastBench() {
     Function_SysBench_Memory_Fast
     Function_DiskTest_Fast
     Function_Speedtest_Fast
-    Function_BestTrace_Fast
+    Function_WorstTrace_Fast
     Function_BenchFinish
     Function_GenerateResult
     Global_Exit_Action
@@ -2602,7 +2563,7 @@ Entrance_FullBench() {
     Function_SysBench_Memory_Full
     Function_DiskTest_Full
     Function_Speedtest_Full
-    Function_BestTrace_Full
+    Function_WorstTrace_Full
     Function_BenchFinish
     Function_GenerateResult
     Global_Exit_Action
@@ -2672,36 +2633,36 @@ Entrance_DiskTest_Full() {
 }
 
 # =============== 入口 - 仅路由追踪测试-快速模式 (btfast) ===============
-Entrance_BestTrace_Fast() {
+Entrance_WorstTrace_Fast() {
     Global_Startup_Header
-    Global_TestMode="besttrace-fast"
+    Global_TestMode="worsttrace-fast"
     Global_TestModeTips="Traceroute Test Only (Fast Mode)"
     Function_CheckTracemode
     Check_JSONQuery
-    Check_BestTrace
+    Check_WorstTrace
     echo -e "${Msg_Info}Collecting Network Info ..."
     SystemInfo_GetNetworkInfo
     Function_BenchStart
     Function_ShowNetworkInfo
-    Function_BestTrace_Fast
+    Function_WorstTrace_Fast
     Function_BenchFinish
     Function_GenerateResult
     Global_Exit_Action
 }
 
 # =============== 入口 - 仅路由追踪测试-完全模式 (btfull) ===============
-Entrance_BestTrace_Full() {
+Entrance_WorstTrace_Full() {
     Global_Startup_Header
-    Global_TestMode="besttrace-full"
+    Global_TestMode="worsttrace-full"
     Global_TestModeTips="Traceroute Test Only (Full Mode)"
     Function_CheckTracemode
     Check_JSONQuery
-    Check_BestTrace
+    Check_WorstTrace
     echo -e "${Msg_Info}Collecting Network Info ..."
     SystemInfo_GetNetworkInfo
     Function_BenchStart
     Function_ShowNetworkInfo
-    Function_BestTrace_Full
+    Function_WorstTrace_Full
     Function_BenchFinish
     Function_GenerateResult
     Global_Exit_Action
@@ -2866,11 +2827,11 @@ while [[ $# -ge 1 ]]; do
     # 路由追踪测试        
     btfast | -btfast | --btfast | trfast | -trfast | --trfast)
         shift
-        GlobalVar_TestMode="besttrace-fast"
+        GlobalVar_TestMode="worsttrace-fast"
         ;;
     btfull | -btfull | --btfull | trfull | -trull | --trfull)
         shift
-        GlobalVar_TestMode="besttrace-full"
+        GlobalVar_TestMode="worsttrace-full"
         ;;
     # Spoof测试
     spf | -spf | --spf | spoof | -spoof | --spoof | spoofer | -spoofer | --spoofer)
@@ -2951,12 +2912,12 @@ elif [ "${GlobalVar_TestMode}" = "speedtest-fast" ]; then
 elif [ "${GlobalVar_TestMode}" = "speedtest-full" ]; then
     Global_Startup_Header
     Entrance_Speedtest_Full
-elif [ "${GlobalVar_TestMode}" = "besttrace-fast" ]; then
+elif [ "${GlobalVar_TestMode}" = "worsttrace-fast" ]; then
     Global_Startup_Header
-    Entrance_BestTrace_Fast
-elif [ "${GlobalVar_TestMode}" = "besttrace-full" ]; then
+    Entrance_WorstTrace_Fast
+elif [ "${GlobalVar_TestMode}" = "worsttrace-full" ]; then
     Global_Startup_Header
-    Entrance_BestTrace_Full
+    Entrance_WorstTrace_Full
 elif [ "${GlobalVar_TestMode}" = "spoof" ]; then
     Global_Startup_Header
     Entrance_Spoofer
